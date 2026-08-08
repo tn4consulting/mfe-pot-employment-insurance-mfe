@@ -19,6 +19,32 @@ const devDefaults = {
   strapiBaseUrl: 'http://localhost:1337',
 };
 
-export function loadRuntimeConfig(ownOriginUrl: string) {
-  return fetchRuntimeConfig(ownOriginUrl, devDefaults);
+/**
+ * The Helm chart deliberately sets `employmentInsuranceBffBaseUrl` to `""`
+ * (same-origin -- see the chart's own comment), and the dev default is
+ * already a full absolute URL (`http://localhost:3002`). A same-origin
+ * *relative* value is only safe for `fetchRuntimeConfig` itself (which
+ * already anchors its own `env.js` fetch to `ownOriginUrl`, per this
+ * file's top comment) -- `HttpEmploymentInsuranceApiClient` later does a
+ * plain `fetch(`${baseUrl}/api/applications`)`, and a relative fetch
+ * always resolves against the *document's* origin, not this remote's own.
+ * Confirmed the hard way: composed into msca-shell at a different origin,
+ * that request silently hit the shell's own nginx (405) instead of this
+ * app's own `/api` Ingress path rule, throwing "temporarily unavailable"
+ * on every submit -- worked fine only when this app happened to be
+ * accessed standalone, at its own origin. Same class of problem
+ * `asset-base-url.ts` already solves for i18n/content-fallback fetches;
+ * anchoring a same-origin-relative value to this remote's own origin here
+ * is the same fix applied to the BFF base URL specifically.
+ */
+function resolveBffBaseUrl(value: string, ownOriginUrl: string): string {
+  if (/^https?:\/\//.test(value)) {
+    return value;
+  }
+  return new URL(ownOriginUrl).origin + value;
+}
+
+export async function loadRuntimeConfig(ownOriginUrl: string) {
+  const config = await fetchRuntimeConfig(ownOriginUrl, devDefaults);
+  return { ...config, employmentInsuranceBffBaseUrl: resolveBffBaseUrl(config.employmentInsuranceBffBaseUrl, ownOriginUrl) };
 }
