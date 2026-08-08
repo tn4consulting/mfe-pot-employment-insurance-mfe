@@ -1,4 +1,5 @@
 import { fetchRuntimeConfig } from '@tn4consulting/shared-runtime-config';
+import { initBrowserObservability } from '@tn4consulting/shared-observability';
 
 /**
  * Replaces environment.ts/environment.prod.ts + fileReplacements -- see
@@ -17,6 +18,9 @@ import { fetchRuntimeConfig } from '@tn4consulting/shared-runtime-config';
 const devDefaults = {
   employmentInsuranceBffBaseUrl: 'http://localhost:3002',
   strapiBaseUrl: 'http://localhost:1337',
+  // undefined -- no local collector needed for plain `nx serve`, see
+  // shared-observability's initBrowserObservability.
+  otelExporterOtlpEndpoint: undefined as string | undefined,
 };
 
 /**
@@ -46,5 +50,17 @@ function resolveBffBaseUrl(value: string, ownOriginUrl: string): string {
 
 export async function loadRuntimeConfig(ownOriginUrl: string) {
   const config = await fetchRuntimeConfig(ownOriginUrl, devDefaults);
+  // Single wiring point for every exposed entry point in this app (App.tsx,
+  // ReportingStatus.tsx as a standalone widget, ...) -- all funnel through
+  // this same function. Idempotent, so calling it more than once per
+  // session is safe. propagateTraceHeaderCorsUrls matches this app's own
+  // BFF Ingress origin on any environment -- see
+  // mfe-pot-platform/CLAUDE.md's observability section for why this is
+  // required, not optional, for a federated remote's BFF calls.
+  initBrowserObservability({
+    serviceName: 'employment-insurance-mfe',
+    otlpEndpoint: config.otelExporterOtlpEndpoint,
+    propagateTraceHeaderCorsUrls: [/^https?:\/\/employment-insurance-mfe\./],
+  });
   return { ...config, employmentInsuranceBffBaseUrl: resolveBffBaseUrl(config.employmentInsuranceBffBaseUrl, ownOriginUrl) };
 }
