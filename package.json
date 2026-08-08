@@ -6,7 +6,9 @@
     "build": "nx run-many -t build --all",
     "lint": "nx run-many -t lint --all && nx run employment-insurance-bff:eslint:lint",
     "test": "nx run-many -t test --all",
-    "deploy:local": "bash tools/deploy-local.sh"
+    "deploy:local": "bash tools/deploy-local.sh",
+    "check:versions": "check-platform-versions",
+    "postinstall": "sync-platform-standards"
   },
   "private": true,
   "devDependencies": {
@@ -25,6 +27,7 @@
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
+    "@tn4consulting/shared-platform-standards": "^0.1.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.0",
     "@types/jest": "~30.0.0",
@@ -59,7 +62,7 @@
     "@tn4consulting/shared-auth-server": "^0.1.0",
     "@tn4consulting/shared-content-client": "^0.3.0",
     "@tn4consulting/shared-federation-config": "^0.7.0",
-    "@tn4consulting/shared-federation-runtime": "^1.0.1",
+    "@tn4consulting/shared-federation-runtime": "^1.0.2",
     "@tn4consulting/shared-i18n": "^1.1.0",
     "@tn4consulting/shared-observability": "^0.1.1",
     "@tn4consulting/shared-observability-server": "^0.1.1",

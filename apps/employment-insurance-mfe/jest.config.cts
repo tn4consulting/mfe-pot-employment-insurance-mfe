@@ -1,3 +1,5 @@
+const transformIgnorePatterns = require('@tn4consulting/shared-platform-standards/configs/jest.transform-ignore.cjs');
+
 module.exports = {
   displayName: 'employment-insurance-mfe',
   preset: '../../jest.preset.js',
@@ -13,7 +15,5 @@ module.exports = {
     ],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
-  transformIgnorePatterns: [
-    'node_modules/(?!\\.pnpm|(@softarc|@jsverse|@tn4consulting|@stencil)/|.*\\.mjs$)',
-  ],
+  transformIgnorePatterns,
 };

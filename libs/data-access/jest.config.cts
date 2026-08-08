@@ -1,3 +1,5 @@
+const transformIgnorePatterns = require('@tn4consulting/shared-platform-standards/configs/jest.transform-ignore.cjs');
+
 module.exports = {
   displayName: 'employment-insurance-data-access',
   preset: '../../jest.preset.js',
@@ -12,8 +14,5 @@ module.exports = {
       },
     ],
   },
-  // @tn4consulting/shared-auth ships ESM-only (see CLAUDE.md's "Monorepo ->
-  // per-app repos" gotcha) -- this lib's Http*ApiClient imports
-  // getAccessToken from it to attach the mock-idp bearer token.
-  transformIgnorePatterns: ['node_modules/(?!\\.pnpm|@tn4consulting/|.*\\.mjs$)'],
+  transformIgnorePatterns,
 };
