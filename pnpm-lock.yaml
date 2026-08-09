@@ -31,8 +31,8 @@ importers:
         specifier: ^0.7.0
         version: 0.7.0(@softarc/native-federation@4.3.2(typescript@6.0.3))
       '@tn4consulting/shared-federation-runtime':
-        specifier: ^2.0.0
-        version: 2.0.0(react@19.2.8)
+        specifier: ^2.1.0
+        version: 2.1.0(react@19.2.8)
       '@tn4consulting/shared-i18n':
         specifier: ^1.1.0
         version: 1.1.0(react@19.2.8)
@@ -49,8 +49,8 @@ importers:
         specifier: ^0.1.0
         version: 0.1.0
       '@tn4consulting/shared-ui-scds-core':
-        specifier: ^1.2.0
-        version: 1.2.0
+        specifier: ^1.3.0
+        version: 1.3.0
       cors:
         specifier: ^2.8.6
         version: 2.8.6
@@ -2678,8 +2678,8 @@ packages:
     peerDependencies:
       '@softarc/native-federation': '>=4.0.0'
 
-  '@tn4consulting/shared-federation-runtime@2.0.0':
-    resolution: {integrity: sha512-2Y5EjRo7TchK+MinTcoKeeDcERgjZgI+kT9k3DIc0LhpaeTukl1/OYRJkKv1xxyev4qZbJ95xePQKzt+FabSjg==, tarball: https://npm.pkg.github.com/download/@tn4consulting/shared-federation-runtime/2.0.0/2b7cea9779a2484e5661e3b66ee55d734109d3ae}
+  '@tn4consulting/shared-federation-runtime@2.1.0':
+    resolution: {integrity: sha512-4DaTuNVJlB3apeZeDNnpI6kOI0ux4ZmBAu7UBn0FPI+ku9cJ5X+/34zwQg9f3vpCITxKaBv4Xs93KcrVzct9zA==, tarball: https://npm.pkg.github.com/download/@tn4consulting/shared-federation-runtime/2.1.0/18dde69d39746c7e7a5b7020f4e9884d76852d71}
     peerDependencies:
       react: '>=19.0.0'
 
@@ -2704,8 +2704,8 @@ packages:
   '@tn4consulting/shared-session-cache@0.1.0':
     resolution: {integrity: sha512-qLypYn/rWxHZfXb5Aug7ZTv+bbnTgZJPt0fswtHlF+Jj2I55q8/LsBAdBJCuZx7PLcHzzORj+XXgIAuKERzbsA==, tarball: https://npm.pkg.github.com/download/@tn4consulting/shared-session-cache/0.1.0/7b08f687121dc57fd1f8dbef289705cff9180fa7}
 
-  '@tn4consulting/shared-ui-scds-core@1.2.0':
-    resolution: {integrity: sha512-tqoaebZVdAzuQHf4BCZDgpSZxUTIGN0QmPrKfGtv3uzIDCN7MBfFBOISNUcTyds55mMg1udxS/UBX4RjgE19wA==, tarball: https://npm.pkg.github.com/download/@tn4consulting/shared-ui-scds-core/1.2.0/afedbe295a9dffe478141dcb135d42600aa7b5dd}
+  '@tn4consulting/shared-ui-scds-core@1.3.0':
+    resolution: {integrity: sha512-fkAgWqOv+kYQ4rbkA31e59F4cO26NsZ2P+9uSGi4SlV6pCmOKeqdiz5lNLtXJhHO5XRM1//zeXEsepg7ySxlYA==, tarball: https://npm.pkg.github.com/download/@tn4consulting/shared-ui-scds-core/1.3.0/1c2745ec2b1bff5eae1b6aef059cdda7df551242}
 
   '@tsconfig/node10@1.0.12':
     resolution: {integrity: sha512-UCYBaeFvM11aU2y3YPZ//O5Rhj+xKyzy7mvcIoAjASbigy8mHMryP5cK7dgjlz2hWxh1g5pLw084E0a/wlUSFQ==}
@@ -9912,7 +9912,7 @@ snapshots:
     dependencies:
       '@softarc/native-federation': 4.3.2(typescript@6.0.3)
 
-  '@tn4consulting/shared-federation-runtime@2.0.0(react@19.2.8)':
+  '@tn4consulting/shared-federation-runtime@2.1.0(react@19.2.8)':
     dependencies:
       react: 19.2.8
 
@@ -9960,7 +9960,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@tn4consulting/shared-ui-scds-core@1.2.0': {}
+  '@tn4consulting/shared-ui-scds-core@1.3.0': {}
 
   '@tsconfig/node10@1.0.12': {}
 
