@@ -4,6 +4,7 @@ import { getStoredSession } from '@tn4consulting/shared-auth/core';
 import { useLocale } from '@tn4consulting/shared-i18n';
 import type { ContentClient } from '@tn4consulting/shared-content-client';
 import { fillTemplate } from '@tn4consulting/shared-content-client';
+import { withRemoteParent } from '@tn4consulting/shared-observability';
 import type { EiReportingStatus, EiReportingStatusLabel, EmploymentInsuranceApiClient } from 'employment-insurance-data-access';
 import { HttpEmploymentInsuranceApiClient } from 'employment-insurance-data-access';
 import { assetBaseUrl } from './asset-base-url';
@@ -39,6 +40,15 @@ export interface ReportingStatusProps {
    * consumer.
    */
   onStatusLoaded?: (status: EiReportingStatus | null) => void;
+  /**
+   * A serialized W3C traceparent from the composing page's own root span
+   * (see @tn4consulting/shared-observability's startPageSpan), so this
+   * widget's own fetch to employment-insurance-bff joins that trace
+   * instead of starting a disconnected one -- see dashboard-mfe's
+   * Overview.tsx. Optional and harmless when absent -- withRemoteParent
+   * no-ops on undefined, same additive shape as onStatusLoaded above.
+   */
+  parentTraceparent?: string;
 }
 
 /**
@@ -54,7 +64,7 @@ export interface ReportingStatusProps {
  * Intl.DateTimeFormat, not raw ISO) plus a raw day count, filled into the
  * CMS template via `fillTemplate`.
  */
-export function ReportingStatus({ onStatusLoaded }: ReportingStatusProps = {}) {
+export function ReportingStatus({ onStatusLoaded, parentTraceparent }: ReportingStatusProps = {}) {
   const locale = useLocale();
   const [apiClient, setApiClient] = useState<EmploymentInsuranceApiClient | null>(null);
   const [contentClient, setContentClient] = useState<ContentClient | null>(null);
@@ -93,8 +103,7 @@ export function ReportingStatus({ onStatusLoaded }: ReportingStatusProps = {}) {
       return;
     }
     let cancelled = false;
-    apiClient
-      .getReportingStatus(session.sub)
+    withRemoteParent(parentTraceparent, () => apiClient.getReportingStatus(session.sub))
       .then((status) => {
         if (!cancelled) {
           setReportingStatus(status);
@@ -111,7 +120,7 @@ export function ReportingStatus({ onStatusLoaded }: ReportingStatusProps = {}) {
     return () => {
       cancelled = true;
     };
-  }, [apiClient]);
+  }, [apiClient, parentTraceparent]);
 
   const formattedNextReportDue = reportingStatus
     ? new Intl.DateTimeFormat(locale === 'fr' ? 'fr-CA' : 'en-CA', { dateStyle: 'long' }).format(

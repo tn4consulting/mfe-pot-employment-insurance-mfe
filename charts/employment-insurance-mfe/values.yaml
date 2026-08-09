@@ -1,6 +1,16 @@
 frontend:
   name: employment-insurance-mfe
+  # Proof scope for mfe-pot/TODO.md's "Design principles" section
+  # (principles 3/4, zero-downtime deploys + node-failure resilience) --
+  # employment-insurance-mfe was picked first, generalizing to the rest of
+  # the family afterward. Local kind default stays at 1 (limits resource
+  # pressure on a single-node dev cluster) -- values-eks.yaml bumps this to
+  # 2 for a real deployment. The rolling-update strategy/soft anti-affinity
+  # from mfe-frontend-lib stay unconditional either way.
   replicaCount: 1
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
   image:
     repository: mfe-pot-employment-insurance-mfe
     tag: latest
@@ -30,7 +40,16 @@ frontend:
 
 backend:
   name: employment-insurance-bff
+  # Same proof-scope reasoning as frontend.replicaCount above -- 1 on
+  # kind, 2 on EKS (values-eks.yaml).
+  # readinessPath: /ready is a real check (round-trips this pod's own
+  # sessionCache, i.e. Redis) -- see app.ts and mfe-backend-lib's
+  # _deployment.tpl comment on why this is distinct from /health.
   replicaCount: 1
+  readinessPath: /ready
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
   image:
     repository: mfe-pot-employment-insurance-bff
     tag: latest
@@ -39,8 +58,7 @@ backend:
   servicePort: 3002
   # session-cache is a separate Helm release in mfe-pot-platform (see its
   # charts/session-cache), installed once independently of any per-app
-  # chart -- genuine cross-Helm-release in-cluster Service DNS, same
-  # pattern as dashboard-bff's JOB_BANK_BFF_URL/EMPLOYMENT_INSURANCE_BFF_URL.
+  # chart -- genuine cross-Helm-release in-cluster Service DNS.
   # MOCK_IDP_JWKS_URL/MOCK_IDP_ISSUER point at mfe-pot-platform's
   # charts/mock-idp release's own in-cluster Service DNS -- server-to-server
   # JWT verification traffic, same pattern as REDIS_URL below. MOCK_IDP_ISSUER

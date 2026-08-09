@@ -15,8 +15,31 @@ export function createApp(): Express {
   app.use(cors());
   app.use(express.json());
 
+  // Bare liveness check -- "the process is up," nothing more. Kept separate
+  // from /ready below since a real readiness check (does this pod's own
+  // sessionCache actually work right now) has a different failure mode: a
+  // BFF that can't reach Redis is genuinely not ready to serve traffic,
+  // but killing/restarting it (what a failing liveness probe triggers)
+  // wouldn't fix a Redis-side outage -- see mfe-pot/TODO.md's "Design
+  // principles" section, principle 3/4.
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok' });
+  });
+
+  // Real readiness check: a round-trip through this pod's own sessionCache
+  // (Redis when REDIS_URL is set, always-succeeds in-memory otherwise --
+  // see config.ts). A slow/unreachable Redis makes this pod fail
+  // readiness, so Kubernetes stops routing it new traffic (via the
+  // Service's endpoint list) without restarting it -- exactly the "not
+  // ready to serve, but not crashed" distinction /health can't express on
+  // its own.
+  app.get('/ready', async (_req, res) => {
+    try {
+      await sessionCache.getJson(sessionCache.buildKey('readiness-probe'));
+      res.json({ status: 'ready' });
+    } catch (err) {
+      res.status(503).json({ status: 'not-ready', error: (err as Error).message });
+    }
   });
 
   app.post('/api/applications', async (req, res) => {
@@ -110,6 +133,18 @@ export function createApp(): Express {
   app.post('/api/reset', async (_req, res) => {
     await sessionCache.reset();
     res.status(204).send();
+  });
+
+  // Last-resort error handler, not per-call-site try/catch: Express 5
+  // (this app's version) auto-forwards a rejected async route handler's
+  // promise here, including every sessionCache.getJson/setJson call above
+  // -- so a Redis outage (the realistic failure mode, given InMemory-
+  // SessionCache never rejects) surfaces as this typed, degraded JSON
+  // envelope instead of Express's bare default 500 HTML page. See
+  // mfe-pot/TODO.md's "Design principles" section, principle 5.
+  app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    console.error('employment-insurance-bff: unhandled request error:', err);
+    res.status(503).json({ error: 'Service temporarily unavailable', degraded: true });
   });
 
   return app;
