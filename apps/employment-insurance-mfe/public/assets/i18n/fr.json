@@ -1,5 +1,8 @@
 {
   "auth": {
     "signInRequired": "Vous devez ouvrir une session pour gérer votre assurance-emploi."
+  },
+  "errors": {
+    "contentUnavailable": "Le contenu de la page est temporairement indisponible."
   }
 }

@@ -106,7 +106,7 @@ export function App() {
           <p>{intro.body}</p>
         </section>
       ) : introLoadError ? (
-        <p role="alert">Page content is temporarily unavailable.</p>
+        <p role="alert">{t('errors.contentUnavailable')}</p>
       ) : null}
       <Applications apiClient={config.apiClient} contentClient={config.contentClient} locale={locale} />
       <Claims apiClient={config.apiClient} contentClient={config.contentClient} locale={locale} />
