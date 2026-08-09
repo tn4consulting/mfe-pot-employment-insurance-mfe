@@ -63,7 +63,7 @@
     "@tn4consulting/shared-auth-server": "^0.1.0",
     "@tn4consulting/shared-content-client": "^0.3.0",
     "@tn4consulting/shared-federation-config": "^0.7.0",
-    "@tn4consulting/shared-federation-runtime": "^1.0.2",
+    "@tn4consulting/shared-federation-runtime": "^2.0.0",
     "@tn4consulting/shared-i18n": "^1.1.0",
     "@tn4consulting/shared-observability": "^0.2.0",
     "@tn4consulting/shared-observability-server": "^0.1.1",

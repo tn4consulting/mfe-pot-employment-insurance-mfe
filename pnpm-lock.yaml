@@ -31,8 +31,8 @@ importers:
         specifier: ^0.7.0
         version: 0.7.0(@softarc/native-federation@4.3.2(typescript@6.0.3))
       '@tn4consulting/shared-federation-runtime':
-        specifier: ^1.0.2
-        version: 1.0.2(react@19.2.8)
+        specifier: ^2.0.0
+        version: 2.0.0(react@19.2.8)
       '@tn4consulting/shared-i18n':
         specifier: ^1.1.0
         version: 1.1.0(react@19.2.8)
@@ -2678,8 +2678,8 @@ packages:
     peerDependencies:
       '@softarc/native-federation': '>=4.0.0'
 
-  '@tn4consulting/shared-federation-runtime@1.0.2':
-    resolution: {integrity: sha512-CvupDBqGDkVD4NirwXa9vBwnMe/6J6UOJ4gV9r+8xamDVVANDmONh2KgCxA0yibTC0FKnUz445VoSbySmiDsiQ==, tarball: https://npm.pkg.github.com/download/@tn4consulting/shared-federation-runtime/1.0.2/d1b7050eb14e1608f2e4d88ed646b5971777a5b3}
+  '@tn4consulting/shared-federation-runtime@2.0.0':
+    resolution: {integrity: sha512-2Y5EjRo7TchK+MinTcoKeeDcERgjZgI+kT9k3DIc0LhpaeTukl1/OYRJkKv1xxyev4qZbJ95xePQKzt+FabSjg==, tarball: https://npm.pkg.github.com/download/@tn4consulting/shared-federation-runtime/2.0.0/2b7cea9779a2484e5661e3b66ee55d734109d3ae}
     peerDependencies:
       react: '>=19.0.0'
 
@@ -9912,7 +9912,7 @@ snapshots:
     dependencies:
       '@softarc/native-federation': 4.3.2(typescript@6.0.3)
 
-  '@tn4consulting/shared-federation-runtime@1.0.2(react@19.2.8)':
+  '@tn4consulting/shared-federation-runtime@2.0.0(react@19.2.8)':
     dependencies:
       react: 19.2.8
 
