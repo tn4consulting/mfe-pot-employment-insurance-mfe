@@ -1,6 +1,6 @@
 // Production/development build for the React employment-insurance
 // remote. Replaces the `@angular-architects/native-federation:build`
-// executor. Same shape as job-bank's/employment-life-events' own
+// executor. Same shape as job-bank's/life-events' own
 // build.mjs -- this app is a plain federation remote (not a host), so it
 // needs both a federation build (for `./Component` and
 // `./EiReportingStatusWidget`) and a standalone build (direct,

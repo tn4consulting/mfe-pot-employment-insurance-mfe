@@ -31,7 +31,7 @@ export interface ReportingStatusProps {
    * status without re-implementing the fetch. Optional and additive --
    * every existing call site (this app's own `App.tsx`, and any federated
    * consumer that predates this prop) still works with zero props. Added
-   * for `mfe-pot-employment-life-events-mfe`'s guided-journey checklist,
+   * for `mfe-pot-life-events-mfe`'s guided-journey checklist,
    * which needs to know whether the citizen has applied for EI and
    * whether their reporting is current, to mark those checklist items
    * complete -- deliberately generic (just "here's what loaded"), not
