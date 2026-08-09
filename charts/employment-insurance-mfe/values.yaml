@@ -4,9 +4,11 @@ frontend:
   # (principles 3/4, zero-downtime deploys + node-failure resilience) --
   # employment-insurance-mfe was picked first, generalizing to the rest of
   # the family afterward. Local kind default stays at 1 (limits resource
-  # pressure on a single-node dev cluster) -- values-eks.yaml bumps this to
-  # 2 for a real deployment. The rolling-update strategy/soft anti-affinity
-  # from mfe-frontend-lib stay unconditional either way.
+  # pressure on a single-node dev cluster) -- EKS stays at 1 too now, see the platform-wide note in
+  # mfe-pot-job-bank-mfe/charts/job-bank-mfe/values.yaml's identical
+  # comment (the real cluster's per-node pod cap doesn't have headroom for
+  # 2x replicas across the family). The rolling-update strategy/soft
+  # anti-affinity from mfe-frontend-lib stay unconditional either way.
   replicaCount: 1
   podDisruptionBudget:
     enabled: false
