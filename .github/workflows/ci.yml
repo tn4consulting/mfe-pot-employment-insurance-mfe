@@ -110,6 +110,21 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # docker/build-push-action's `secrets:` input is line-oriented (one
+      # key=value pair per line) -- a genuinely multi-line value like a PEM
+      # private key gets truncated at its first embedded newline (confirmed
+      # live in mfe-pot-job-bank-mfe's CI: ERR_OSSL_ASN1_NOT_ENOUGH_DATA,
+      # importPKCS8 choking on a key cut off after "-----BEGIN PRIVATE
+      # KEY-----"). Writing it to a runner-local file first and passing
+      # that via `secret-files:` instead sidesteps the line-oriented format
+      # entirely -- the Dockerfile's own `--mount=type=secret` step needs
+      # no change, BuildKit provides a file at /run/secrets/remote_signing_key
+      # either way.
+      - name: Write signing key to a temp file
+        env:
+          REMOTE_SIGNING_PRIVATE_KEY: ${{ secrets.REMOTE_SIGNING_PRIVATE_KEY }}
+        run: printf '%s' "$REMOTE_SIGNING_PRIVATE_KEY" > "$RUNNER_TEMP/remote_signing_key.pem"
+
       - name: Build and push employment-insurance-mfe image to GHCR
         uses: docker/build-push-action@v6
         with:
@@ -117,8 +132,19 @@ jobs:
           file: apps/employment-insurance-mfe/Dockerfile
           push: true
           tags: ghcr.io/tn4consulting/mfe-pot-employment-insurance-mfe:${{ github.sha }}
+          # REMOTE_SIGNING_KID is not secret -- it's how a shell picks
+          # which trust-registry entry to verify a signature against, so
+          # it's a plain build-arg, not a secret.
+          build-args: |
+            REMOTE_SIGNING_KID=${{ vars.REMOTE_SIGNING_KID }}
           secrets: |
             npm_token=${{ secrets.NPM_READ_TOKEN }}
+          secret-files: |
+            remote_signing_key=${{ runner.temp }}/remote_signing_key.pem
+
+      - name: Clean up signing key temp file
+        if: always()
+        run: rm -f "$RUNNER_TEMP/remote_signing_key.pem"
 
       - name: Build and push employment-insurance-bff image to GHCR
         uses: docker/build-push-action@v6
