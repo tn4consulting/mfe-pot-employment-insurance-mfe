@@ -262,18 +262,40 @@ jobs:
       - name: Verify the deployed app is actually reachable
         run: |
           set -eu
+          host="employment-insurance-mfe.mfe-pot.local"
+
           # helm install --wait only waits for the pod to be Ready, not for
           # ingress-nginx's own reconciliation loop to pick up the new
-          # Ingress resource -- give it a few seconds before asserting.
-          for i in $(seq 1 30); do
-            status=$(curl -s -o /dev/null -w '%{http_code}' -H "Host: employment-insurance-mfe.mfe-pot.local" http://localhost/ || echo 000)
-            [ "$status" = "200" ] && break
-            sleep 2
-          done
-          curl -sf -H "Host: employment-insurance-mfe.mfe-pot.local" http://localhost/ | grep -qi '<script src="env.js">'
-          curl -sf -H "Host: employment-insurance-mfe.mfe-pot.local" http://localhost/env.js | grep -q '"employmentInsuranceBffBaseUrl":""'
-          status=$(curl -s -o /dev/null -w '%{http_code}' -H "Host: employment-insurance-mfe.mfe-pot.local" "http://localhost/api/claims")
-          [ "$status" = "400" ]
+          # Ingress resource, or for the /api backend Service's Endpoints
+          # to finish propagating through kube-proxy -- retry every
+          # assertion below, not just the first one (a previous version of
+          # this step only retried the root-page check, which let a bare
+          # /api race silently fail the whole job with -sf/-q swallowing
+          # any diagnostic output). On a final failure, print the actual
+          # status/body we got instead of a bare exit 1.
+          check() {
+            description=$1; url=$2; want_status=$3; want_body=$4
+            for i in $(seq 1 30); do
+              response=$(curl -s -w '\nHTTPSTATUS:%{http_code}' -H "Host: $host" "$url" || true)
+              status=$(printf '%s' "$response" | tail -1 | sed 's/^HTTPSTATUS://')
+              body=$(printf '%s' "$response" | sed '$d')
+              if [ "$status" = "$want_status" ] && { [ -z "$want_body" ] || printf '%s' "$body" | grep -qi -- "$want_body"; }; then
+                echo "OK   $description ($status)"
+                return 0
+              fi
+              sleep 2
+            done
+            {
+              echo "FAIL $description -- wanted status $want_status${want_body:+, body containing '$want_body'}"
+              echo "     got status: $status"
+              echo "     got body:   $body"
+            } >&2
+            return 1
+          }
+
+          check "root page (index.html)" "http://localhost/" 200 '<script src="env.js">'
+          check "env.js (ConfigMap round-trip)" "http://localhost/env.js" 200 '"employmentInsuranceBffBaseUrl":""'
+          check "BFF via /api" "http://localhost/api/claims" 400 ''
 
   # Stage 3: mirror the images build-images already pushed to GHCR into ECR
   # (pull+retag+push, not a rebuild), and deploy to the real AWS EKS
